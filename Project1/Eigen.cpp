@@ -252,18 +252,7 @@ void r8mat_diag_get_vector(int n, double a[], double v[])
 //    An R8MAT is a doubly dimensioned array of R8 values, stored as a vector
 //    in column-major order.
 //
-//  Licensing:
-//
-//    This code is distributed under the GNU LGPL license.
-//
-//  Modified:
-//
-//    15 July 2013
-//
-//  Author:
-//
-//    John Burkardt
-//
+
 //  Parameters:
 //
 //    Input, int N, the number of rows and columns of the matrix.
