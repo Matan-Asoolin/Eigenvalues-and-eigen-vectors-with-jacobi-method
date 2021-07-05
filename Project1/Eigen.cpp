@@ -54,13 +54,13 @@ void jacobi_eigenvalue(int n, double a[], int it_max, double v[], double d[], in
     double termp;
     double termq;
     double theta;
-    double thresh;
+    double sum_for_stop_rotate;
     double w;
     double* zw;
 
-    r8mat_identity(n, v);
+    r8mat_identity(n, v);  // sets square of v to be 1, identity matrix
 
-    r8mat_diag_get_vector(n, a, d);
+    r8mat_diag_get_vector(n, a, d);  // diagonal entries of the matrix a returns in d
 
     bw = new double[n];
     zw = new double[n];
@@ -77,21 +77,21 @@ void jacobi_eigenvalue(int n, double a[], int it_max, double v[], double d[], in
     {
         it_num = it_num + 1;
         //
-        //  The convergence threshold is based on the size of the elements in
+        //  The convergence sum_for_stop_rotateold is based on the size of the elements in
         //  the strict upper triangle of the matrix.
         //
-        thresh = 0.0;
+        sum_for_stop_rotate = 0.0;
         for (j = 0; j < n; j++)
         {
             for (i = 0; i < j; i++)
             {
-                thresh = thresh + a[i + j * n] * a[i + j * n];
+                sum_for_stop_rotate = sum_for_stop_rotate + a[i + j * n] * a[i + j * n];
             }
         }
 
-        thresh = sqrt(thresh) / (double)(4 * n);
+        sum_for_stop_rotate = sqrt(sum_for_stop_rotate) / (double)(4 * n);
 
-        if (thresh == 0.0)
+        if (sum_for_stop_rotate == 0.0)
         {
             break;
         }
@@ -106,16 +106,14 @@ void jacobi_eigenvalue(int n, double a[], int it_max, double v[], double d[], in
                 //
                 //  Annihilate tiny offdiagonal elements.
                 //
-                if (4 < it_num &&
-                    termp == fabs(d[p]) &&
-                    termq == fabs(d[q]))
+                if (4 < it_num && termp == fabs(d[p]) && termq == fabs(d[q]))
                 {
                     a[p + q * n] = 0.0;
                 }
                 //
                 //  Otherwise, apply a rotation.
                 //
-                else if (thresh <= fabs(a[p + q * n]))
+                else if (sum_for_stop_rotate <= fabs(a[p + q * n]))
                 {
                     h = d[q] - d[p];
                     term = fabs(h) + gapq;
@@ -124,7 +122,7 @@ void jacobi_eigenvalue(int n, double a[], int it_max, double v[], double d[], in
                     {
                         t = a[p + q * n] / h;
                     }
-                    else
+                    else  // theta calc
                     {
                         theta = 0.5 * h / a[p + q * n];
                         t = 1.0 / (fabs(theta) + sqrt(1.0 + theta * theta));
@@ -287,18 +285,6 @@ void r8mat_identity(int n, double a[])
 //    An R8MAT is a doubly dimensioned array of R8 values, stored as a vector
 //    in column-major order.
 //
-//  Licensing:
-//
-//    This code is distributed under the GNU LGPL license.
-//
-//  Modified:
-//
-//    01 December 2011
-//
-//  Author:
-//
-//    John Burkardt
-//
 //  Parameters:
 //
 //    Input, int N, the order of A.
@@ -355,18 +341,6 @@ double r8mat_is_eigen_right(int n, int k, double a[], double x[],
     //      LAMBDA is a K by K diagonal matrix of eigenvalues.
     //
     //    This routine assumes that A, X and LAMBDA are all real.
-    //
-    //  Licensing:
-    //
-    //    This code is distributed under the GNU LGPL license. 
-    //
-    //  Modified:
-    //
-    //    07 October 2010
-    //
-    //  Author:
-    //
-    //    John Burkardt
     //
     //  Parameters:
     //
@@ -442,19 +416,6 @@ double r8mat_norm_fro(int m, int n, double a[])
 //    The matrix Frobenius norm is not derived from a vector norm, but
 //    is compatible with the vector L2 norm, so that:
 //
-//      r8vec_norm_l2 ( A * x ) <= r8mat_norm_fro ( A ) * r8vec_norm_l2 ( x ).
-//
-//  Licensing:
-//
-//    This code is distributed under the GNU LGPL license.
-//
-//  Modified:
-//
-//    10 October 2005
-//
-//  Author:
-//
-//    John Burkardt
 //
 //  Parameters:
 //
@@ -501,17 +462,6 @@ void r8mat_print(int m, int n, double a[], string title)
 //
 //    Entry A(I,J) is stored as A[I+J*M]
 //
-//  Licensing:
-//
-//    This code is distributed under the GNU LGPL license.
-//
-//  Modified:
-//
-//    10 September 2009
-//
-//  Author:
-//
-//    John Burkardt
 //
 //  Parameters:
 //
@@ -547,14 +497,6 @@ void r8mat_print_some(int m, int n, double a[], int ilo, int jlo, int ihi,
     //  Licensing:
     //
     //    This code is distributed under the GNU LGPL license.
-    //
-    //  Modified:
-    //
-    //    26 June 2013
-    //
-    //  Author:
-    //
-    //    John Burkardt
     //
     //  Parameters:
     //
@@ -668,19 +610,6 @@ void r8vec_print(int n, double a[], string title)
 //  Discussion:
 //
 //    An R8VEC is a vector of R8's.
-//
-//  Licensing:
-//
-//    This code is distributed under the GNU LGPL license.
-//
-//  Modified:
-//
-//    16 August 2004
-//
-//  Author:
-//
-//    John Burkardt
-//
 //  Parameters:
 //
 //    Input, int N, the number of components of the vector.
@@ -705,7 +634,7 @@ void r8vec_print(int n, double a[], string title)
 }
 //****************************************************************************80
 
-void timestamp()
+//void timestamp()
 
 //****************************************************************************80
 //
@@ -717,48 +646,36 @@ void timestamp()
 //
 //    31 May 2001 09:45:54 AM
 //
-//  Licensing:
-//
-//    This code is distributed under the GNU LGPL license.
-//
-//  Modified:
-//
-//    08 July 2009
-//
-//  Author:
-//
-//    John Burkardt
-//
 //  Parameters:
 //
 //    None
 //
-{
-# define TIME_SIZE 40
-
-    static char time_buffer[TIME_SIZE];
-    const struct std::tm* tm_ptr;
-    std::time_t now;
-
-    /* now = std::time(NULL);
-     tm_ptr = std::localtime(&now);
-
-     std::strftime(time_buffer, TIME_SIZE, "%d %B %Y %I:%M:%S %p", tm_ptr);
-
-     std::cout << time_buffer << "\n";*/
-
-    return;
-# undef TIME_SIZE
-}
+//{
+//# define TIME_SIZE 40
+//
+//    static char time_buffer[TIME_SIZE];
+//    const struct std::tm* tm_ptr;
+//    std::time_t now;
+//
+//    /* now = std::time(NULL);
+//     tm_ptr = std::localtime(&now);
+//
+//     std::strftime(time_buffer, TIME_SIZE, "%d %B %Y %I:%M:%S %p", tm_ptr);
+//
+//     std::cout << time_buffer << "\n";*/
+//
+//    return;
+//# undef TIME_SIZE
+//}
 using namespace std;
 
-const int SIZE = 1000000;
+const int SIZE = 25;
 double grades[SIZE];
 double eigenvec[SIZE];
 double eigenval[SIZE];
 void readData() {
 
-    string inFileName = "data_8.txt";
+    string inFileName = "data_2.txt";
     ifstream inFile;
     inFile.open(inFileName.c_str());
 
@@ -782,11 +699,11 @@ void readData() {
 
 int main() {
     auto start = chrono::steady_clock::now();
-    int a = 5, b = 7, count = 0, n = 1000, index = 1;
+    int a = 5, b = 7, count = 0, n = 5, index = 1;
     readData();
     int* it_num = &a;
     int* rot_num = &b;
-    jacobi_eigenvalue(n, grades, 10000, eigenvec, eigenval, *it_num, *rot_num);
+    jacobi_eigenvalue(n, grades, 25, eigenvec, eigenval, *it_num, *rot_num);
     auto end = chrono::steady_clock::now();
     cout << "algorithm finished.";
 
