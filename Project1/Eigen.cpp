@@ -317,135 +317,8 @@ void r8mat_identity(int n, double a[])
 }
 //****************************************************************************80
 
-double r8mat_is_eigen_right(int n, int k, double a[], double x[],
-    double lambda[])
 
-    //****************************************************************************80
-    //
-    //  Purpose:
-    //
-    //    R8MAT_IS_EIGEN_RIGHT determines the error in a (right) eigensystem.
-    //
-    //  Discussion:
-    //
-    //    An R8MAT is a matrix of doubles.
-    //
-    //    This routine computes the Frobenius norm of
-    //
-    //      A * X - X * LAMBDA
-    //
-    //    where
-    //
-    //      A is an N by N matrix,
-    //      X is an N by K matrix (each of K columns is an eigenvector)
-    //      LAMBDA is a K by K diagonal matrix of eigenvalues.
-    //
-    //    This routine assumes that A, X and LAMBDA are all real.
-    //
-    //  Parameters:
-    //
-    //    Input, int N, the order of the matrix.
-    //
-    //    Input, int K, the number of eigenvectors.
-    //    K is usually 1 or N.
-    //
-    //    Input, double A[N*N], the matrix.
-    //
-    //    Input, double X[N*K], the K eigenvectors.
-    //
-    //    Input, double LAMBDA[K], the K eigenvalues.
-    //
-    //    Output, double R8MAT_IS_EIGEN_RIGHT, the Frobenius norm
-    //    of the difference matrix A * X - X * LAMBDA, which would be exactly zero
-    //    if X and LAMBDA were exact eigenvectors and eigenvalues of A.
-    //
-{
-    double* c;
-    double error_frobenius;
-    int i;
-    int j;
-    int l;
 
-    c = new double[n * k];
-
-    for (j = 0; j < k; j++)
-    {
-        for (i = 0; i < n; i++)
-        {
-            c[i + j * n] = 0.0;
-            for (l = 0; l < n; l++)
-            {
-                c[i + j * n] = c[i + j * n] + a[i + l * n] * x[l + j * n];
-            }
-        }
-    }
-
-    for (j = 0; j < k; j++)
-    {
-        for (i = 0; i < n; i++)
-        {
-            c[i + j * n] = c[i + j * n] - lambda[j] * x[i + j * n];
-        }
-    }
-
-    error_frobenius = r8mat_norm_fro(n, k, c);
-
-    delete[] c;
-
-    return error_frobenius;
-}
-//****************************************************************************80
-
-double r8mat_norm_fro(int m, int n, double a[])
-
-//****************************************************************************80
-//
-//  Purpose:
-//
-//    R8MAT_NORM_FRO returns the Frobenius norm of an R8MAT.
-//
-//  Discussion:
-//
-//    An R8MAT is a doubly dimensioned array of R8 values, stored as a vector
-//    in column-major order.
-//
-//    The Frobenius norm is defined as
-//
-//      R8MAT_NORM_FRO = sqrt (
-//        sum ( 1 <= I <= M ) sum ( 1 <= j <= N ) A(I,J)^2 )
-//    The matrix Frobenius norm is not derived from a vector norm, but
-//    is compatible with the vector L2 norm, so that:
-//
-//
-//  Parameters:
-//
-//    Input, int M, the number of rows in A.
-//
-//    Input, int N, the number of columns in A.
-//
-//    Input, double A[M*N], the matrix whose Frobenius
-//    norm is desired.
-//
-//    Output, double R8MAT_NORM_FRO, the Frobenius norm of A.
-//
-{
-    int i;
-    int j;
-    double value;
-
-    value = 0.0;
-    for (j = 0; j < n; j++)
-    {
-        for (i = 0; i < m; i++)
-        {
-            value = value + pow(a[i + j * m], 2);
-        }
-    }
-    value = sqrt(value);
-
-    return value;
-}
-//****************************************************************************80
 
 void r8mat_print(int m, int n, double a[], string title)
 
@@ -493,10 +366,6 @@ void r8mat_print_some(int m, int n, double a[], int ilo, int jlo, int ihi,
     //
     //    An R8MAT is a doubly dimensioned array of R8 values, stored as a vector
     //    in column-major order.
-    //
-    //  Licensing:
-    //
-    //    This code is distributed under the GNU LGPL license.
     //
     //  Parameters:
     //
@@ -632,41 +501,8 @@ void r8vec_print(int n, double a[], string title)
 
     return;
 }
-//****************************************************************************80
 
-//void timestamp()
 
-//****************************************************************************80
-//
-//  Purpose:
-//
-//    TIMESTAMP prints the current YMDHMS date as a time stamp.
-//
-//  Example:
-//
-//    31 May 2001 09:45:54 AM
-//
-//  Parameters:
-//
-//    None
-//
-//{
-//# define TIME_SIZE 40
-//
-//    static char time_buffer[TIME_SIZE];
-//    const struct std::tm* tm_ptr;
-//    std::time_t now;
-//
-//    /* now = std::time(NULL);
-//     tm_ptr = std::localtime(&now);
-//
-//     std::strftime(time_buffer, TIME_SIZE, "%d %B %Y %I:%M:%S %p", tm_ptr);
-//
-//     std::cout << time_buffer << "\n";*/
-//
-//    return;
-//# undef TIME_SIZE
-//}
 using namespace std;
 
 const int SIZE = 25;
